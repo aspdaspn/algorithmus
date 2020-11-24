@@ -75,10 +75,16 @@ int main() {
 					for (j = 1; j < 11; j++)
 						if (first[j - 1] == second[i - 1]) {
 							sequence[i][j] = sequence[i - 1][j] + 1;
-							for (k = j + 1; k < 11; k++)
+							for (k = j; k < 10; k++)
 								sequence[i][k + 1] = sequence[i][k];
-						} else
-							sequence[i][j] = sequence[i - 1][j];
+							printf("Match %d %d\n", i, j);
+							print2(10, 11, sequence);
+						} else {
+//							sequence[i][j] = sequence[i - 1][j];
+							sequence[i][j] = sequence[i][j - 1];
+							printf("Not match %d %d\n", i, j);
+							print2(10, 11, sequence);
+						}
 				print2(10, 11, sequence);
 				break;
 			case 3:
