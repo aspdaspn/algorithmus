@@ -28,7 +28,7 @@ void print2(int n, int m, int a[n][m]) {
 }
 
 int can_move(int x, int y, int b[8][8]) {
-	if (x < 1 || x > 7 || y < 0 || y > 7) {
+	if (x < 0 || x > 7 || y < 0 || y > 7) {
 		printf("cannot move! x = %d y = %d\n", x, y);
 		return 0;
 	}
@@ -42,23 +42,22 @@ int can_move(int x, int y, int b[8][8]) {
 int next_move(int x, int y, int b[8][8], int m[8][2], int move) {
 	int i;
 	int newX, newY;
-	if (move > 64)
-		return 0;
-	else {
-		b[x][y] = move;
-		printf("%d %d %d %d\n", move, x, y, b[x][y]);
-		for (i = 0; i < 8; i++) {
-			newX = x + m[i][0];
-			newY = y + m[i][1];
-			if (can_move(newX, newY, b) && next_move(newX, newY, b, m, move + 1)) {
-				b[x][y] = move;
-				return move;
-			} else {
-				b[x][y] = 0;
-			}
+	b[x][y] = move;
+	if (move == 64)
+		return 1;
+	printf("%d %d %d %d\n", move, x, y, b[x][y]);
+	for (i = 0; i < 8; i++) {
+		newX = x + m[i][0];
+		newY = y + m[i][1];
+		if (can_move(newX, newY, b) && next_move(newX, newY, b, m, move + 1)) {
+			b[x][y] = move;
+			return 1;
 		}
 	}
+	b[x][y] = 0;
+	return 0;
 }
+
 void knight_move() {
 	int board[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
 										 {0, 0, 0, 0, 0, 0, 0, 0},
