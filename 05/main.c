@@ -8,6 +8,7 @@
 */
 
 #include <stdio.h>
+#include <malloc.h>
 #define StringSize 81
 #define StackSize StringSize
 
@@ -17,6 +18,7 @@ int sp = -1;
 void display_menu() {
 	printf("Select the task:\n\n");
 	printf("1: \tBraces Sequence\n");
+	printf("2: \tReverse Polish Notation\n");
 	printf("0: \tExit\n");
 	printf(">\t");
 }
@@ -75,6 +77,109 @@ void check_braces() {
 	printf("%s\n", (sp == -1) ? "Braces are correct" : "Braces are wrong"); 
 }
 
+struct component {
+	char value;
+	struct component *p_next;
+};
+typedef struct component Component;
+
+struct dstack {
+	Component *p_head;
+	int size;
+	int maxSize;
+};
+struct dstack DStack;
+
+void push_dstack(char c) {
+	if (DStack.size < DStack.maxSize) {
+		Component *p_tmp = (Component *) malloc(sizeof(Component));
+		p_tmp -> value = c;
+		p_tmp -> p_next = DStack.p_head;
+		DStack.p_head = p_tmp;
+		DStack.size++;
+	} else
+			printf("Error stack size\n");
+}
+
+char pop_dstack() {
+	char c;
+	if (DStack.size != 0) {
+		Component *p_next = NULL;
+		c = DStack.p_head -> value;
+		p_next = DStack.p_head;
+		DStack.p_head = DStack.p_head -> p_next;
+		free(p_next);
+		DStack.size--;
+		return c;
+	} else 
+			return '~';	
+}
+
+void print_stack() {
+	Component *p_current = DStack.p_head;
+	while (p_current != NULL) {
+		printf(" %c ", p_current -> value);
+		p_current = p_current -> p_next;
+	}
+}
+
+// Обратная польская запись
+void rpn() {
+	char ts[StringSize];
+	int i = 0;
+	int j = 0;
+	char tmp;
+	DStack.maxSize = 100;
+	DStack.p_head = NULL;
+	printf("Enter infix string: ");
+	fgets(ts, sizeof(ts) / sizeof(char), stdin);
+	printf("Postfix notation: ");	
+	while (ts[i] != '\0') {
+		while (ts[j] != '-' || ts[j] != '+' || ts[j] != '/' || ts[j] != '*' || ts[j] != '(' || ts[j] != ')') {
+			if (ts[j] >= '0' && ts[j] <= '9')
+				printf("%c", ts[j]);
+			j++;
+		}
+		printf(", ");
+		if (ts[j] == '(')
+			push_dstack(ts[j]);
+		if (ts[j] == '+' || ts[j] == '-') {
+			tmp = pop_dstack();
+			if (tmp == '~')
+				push_dstack(ts[j]);
+			if (tmp == '-' || tmp == '+') {
+				printf(" %c ", tmp);
+				push_dstack(ts[j]);
+			}
+			if (tmp == '/' || tmp == '*') {
+				printf(" %c ", tmp);
+				push_dstack(ts[j]);
+			}
+		}
+		if (ts[j] == '*' || ts[j] == '/') {
+			tmp = pop_dstack();
+			if (tmp == '~')
+				push_dstack(ts[j]);
+			if (tmp == '-' || tmp == '+') {
+				push_dstack(tmp);
+				push_dstack(ts[j]);
+			}
+			if (tmp == '*' || tmp == '/') {
+				printf(" %c ", tmp);
+				push_dstack(ts[j]);
+			}
+		}
+		if (ts[j] == ')') {
+			tmp = pop_dstack();
+			while (tmp != '(')
+				printf(" %c ", pop_dstack());
+		}
+		i = j;
+	}
+	print_stack();
+	printf(" \n");
+}
+
 int main() {
 	int selector = 0;
 	do {
@@ -84,6 +189,9 @@ int main() {
 		switch (selector) {
 			case 1:
 				check_braces();
+				break;
+			case 2:
+				rpn();
 				break;
 			case 0:
 				break;
