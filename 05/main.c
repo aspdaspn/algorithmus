@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 #define StringSize 81
 #define StackSize StringSize
 
@@ -133,9 +134,15 @@ void rpn() {
 	DStack.p_head = NULL;
 	printf("Enter infix string: ");
 	fgets(ts, sizeof(ts) / sizeof(char), stdin);
+	for (i = strlen(ts)-1; i > -1; i--)
+		if (ts[i] == '\r' || ts[i] == '\n')
+			ts[i] = 0;
+		else
+			break;
 	printf("Postfix notation: ");	
+	i = 0;
 	while (ts[i] != '\0') {
-		while (ts[j] != '-' || ts[j] != '+' || ts[j] != '/' || ts[j] != '*' || ts[j] != '(' || ts[j] != ')') {
+		while (ts[j] != '-' && ts[j] != '+' && ts[j] != '/' && ts[j] != '*' && ts[j] != '(' && ts[j] != ')' && ts[j] != '\0') {
 			if (ts[j] >= '0' && ts[j] <= '9')
 				printf("%c", ts[j]);
 			j++;
@@ -143,37 +150,40 @@ void rpn() {
 		printf(", ");
 		if (ts[j] == '(')
 			push_dstack(ts[j]);
-		if (ts[j] == '+' || ts[j] == '-') {
+		else if (ts[j] == '+' || ts[j] == '-') {
 			tmp = pop_dstack();
 			if (tmp == '~')
 				push_dstack(ts[j]);
-			if (tmp == '-' || tmp == '+') {
+			else if (tmp == '-' || tmp == '+') {
 				printf(" %c ", tmp);
 				push_dstack(ts[j]);
 			}
-			if (tmp == '/' || tmp == '*') {
+			else if (tmp == '/' || tmp == '*') {
 				printf(" %c ", tmp);
 				push_dstack(ts[j]);
 			}
 		}
-		if (ts[j] == '*' || ts[j] == '/') {
+		else if (ts[j] == '*' || ts[j] == '/') {
 			tmp = pop_dstack();
 			if (tmp == '~')
 				push_dstack(ts[j]);
-			if (tmp == '-' || tmp == '+') {
+			else if (tmp == '-' || tmp == '+') {
 				push_dstack(tmp);
 				push_dstack(ts[j]);
 			}
-			if (tmp == '*' || tmp == '/') {
+			else if (tmp == '*' || tmp == '/') {
 				printf(" %c ", tmp);
 				push_dstack(ts[j]);
 			}
 		}
-		if (ts[j] == ')') {
+		else if (ts[j] == ')') {
 			tmp = pop_dstack();
 			while (tmp != '(')
 				printf(" %c ", pop_dstack());
 		}
+		else if (ts[j] == '\0')
+			break;
+		j++;
 		i = j;
 	}
 	print_stack();
