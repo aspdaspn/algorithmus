@@ -132,6 +132,7 @@ void rpn() {
 	char tmp;
 	DStack.maxSize = 100;
 	DStack.p_head = NULL;
+	DStack.size = 0;
 	printf("Enter infix string: ");
 	fgets(ts, sizeof(ts) / sizeof(char), stdin);
 	for (i = strlen(ts)-1; i > -1; i--)
@@ -142,17 +143,23 @@ void rpn() {
 	printf("Postfix notation: ");	
 	i = 0;
 	while (ts[i] != '\0') {
+		int numprint = 0;
 		while (ts[j] != '-' && ts[j] != '+' && ts[j] != '/' && ts[j] != '*' && ts[j] != '(' && ts[j] != ')' && ts[j] != '\0') {
-			if (ts[j] >= '0' && ts[j] <= '9')
+			if (ts[j] >= '0' && ts[j] <= '9') {
 				printf("%c", ts[j]);
+				numprint++;
+			}
 			j++;
 		}
-		printf(", ");
+		if (numprint)
+			printf(", ");
 		if (ts[j] == '(')
 			push_dstack(ts[j]);
 		else if (ts[j] == '+' || ts[j] == '-') {
 			tmp = pop_dstack();
-			if (tmp == '~')
+			if (tmp == '(')
+				push_dstack(tmp);
+			if (tmp == '~' || tmp == '(')
 				push_dstack(ts[j]);
 			else if (tmp == '-' || tmp == '+') {
 				printf(" %c ", tmp);
@@ -165,7 +172,9 @@ void rpn() {
 		}
 		else if (ts[j] == '*' || ts[j] == '/') {
 			tmp = pop_dstack();
-			if (tmp == '~')
+			if (tmp == '(')
+				push_dstack(tmp);
+			if (tmp == '~' || tmp == '(')
 				push_dstack(ts[j]);
 			else if (tmp == '-' || tmp == '+') {
 				push_dstack(tmp);
@@ -178,8 +187,10 @@ void rpn() {
 		}
 		else if (ts[j] == ')') {
 			tmp = pop_dstack();
-			while (tmp != '(')
-				printf(" %c ", pop_dstack());
+			while (tmp != '(') {
+				printf(" %c ", tmp);
+				tmp = pop_dstack();
+			}
 		}
 		else if (ts[j] == '\0')
 			break;
