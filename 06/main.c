@@ -18,7 +18,7 @@ int hash(char s[], int size) {
 }
 
 int main() {
-	char string[] = {'T','e','s','t',' ','s','t','r','i','n','g'};
+	char string[] = {'T','x','s','t',' ','s','t','r','i','n','g'};
 	printf("Hash: %d\n", hash(string, 11));
 	return 0;
 }
